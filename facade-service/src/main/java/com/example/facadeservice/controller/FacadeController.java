@@ -1,7 +1,6 @@
 package com.example.facadeservice.controller;
 
 import com.example.facadeservice.service.FacadeService;
-import com.example.facadeservice.service.FacadeServiceImpl;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,7 +9,11 @@ import reactor.core.publisher.Mono;
 
 @RestController
 public class FacadeController {
-    private final FacadeService service = new FacadeServiceImpl();
+    private final FacadeService service;
+
+    public FacadeController(FacadeService service) {
+        this.service = service;
+    }
 
     @GetMapping("/facade-service")
     public Mono<String> getMessages() {
@@ -23,8 +26,6 @@ public class FacadeController {
             System.out.println("Processed empty message");
             return Mono.error(new IllegalArgumentException("Message cannot be empty"));
         }
-
-        System.out.println("Message is processed: " + text);
         return service.postMessage(text);
     }
 

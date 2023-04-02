@@ -1,8 +1,9 @@
 package com.example.loggingservice.controller;
 
 import com.example.loggingservice.service.LoggingService;
-import com.example.loggingservice.service.LoggingServiceImpl;
 import com.example.loggingservice.domain.Message;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LoggingController {
 
-    private final LoggingService service = new LoggingServiceImpl();
+    private final LoggingService service;
+
+    public LoggingController(LoggingService service) {
+        this.service = service;
+    }
 
     @GetMapping("/logging-service")
     public String getMessages() {
@@ -19,14 +24,10 @@ public class LoggingController {
     }
 
     @PostMapping("/logging-service")
-    public void postMessage(@RequestBody Message message) {
-        if (message == null || message.isEmpty()) {
-            System.out.println("Received empty message");
-            return;
-        }
-
-        System.out.println("Message added to local storage: " + message.getText());
+    public ResponseEntity<Void> postMessage(@RequestBody Message message) {
+        System.out.println("Message added to storage: " + message.getText());
         service.addMessage(message);
+        return ResponseEntity.ok().build();
     }
 
 }
