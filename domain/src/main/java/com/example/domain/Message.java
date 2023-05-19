@@ -1,14 +1,21 @@
-package com.example.loggingservice.domain;
+package com.example.domain;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {
-    private final UUID id;
-    private final String text;
+public class Message implements Serializable {
+    private UUID id;
+    private String text;
+
+    public Message() {}
 
     public Message(UUID id, String text) {
         this.id = id;
         this.text = text;
+    }
+
+    public static Message createMessage(String text) {
+        return new Message(UUID.randomUUID(), text);
     }
 
     public UUID getId() {
@@ -22,9 +29,5 @@ public class Message {
     @Override
     public String toString() {
         return text;
-    }
-
-    public boolean isEmpty() {
-        return text.isEmpty();
     }
 }

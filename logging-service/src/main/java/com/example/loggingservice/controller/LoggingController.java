@@ -1,8 +1,7 @@
 package com.example.loggingservice.controller;
 
+import com.example.domain.Message;
 import com.example.loggingservice.service.LoggingService;
-import com.example.loggingservice.domain.Message;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

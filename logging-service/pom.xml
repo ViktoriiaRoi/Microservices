@@ -33,6 +33,13 @@
             <artifactId>hazelcast</artifactId>
             <version>5.2.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>domain</artifactId>
+            <version>1.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

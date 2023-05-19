@@ -1,6 +1,6 @@
 package com.example.loggingservice.repository;
 
-import com.example.loggingservice.domain.Message;
+import com.example.domain.Message;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.springframework.context.annotation.Primary;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @Primary

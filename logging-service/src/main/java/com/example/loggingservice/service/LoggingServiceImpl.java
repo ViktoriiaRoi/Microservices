@@ -1,10 +1,8 @@
 package com.example.loggingservice.service;
 
+import com.example.domain.Message;
 import com.example.loggingservice.repository.LoggingRepository;
-import com.example.loggingservice.domain.Message;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class LoggingServiceImpl implements LoggingService {

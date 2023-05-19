@@ -1,7 +1,6 @@
 package com.example.loggingservice.repository;
 
-import com.example.loggingservice.domain.Message;
-import org.springframework.stereotype.Repository;
+import com.example.domain.Message;
 
 public interface LoggingRepository {
     String getMessages();

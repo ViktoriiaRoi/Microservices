@@ -1,7 +1,6 @@
 package com.example.loggingservice.repository;
 
-import com.example.loggingservice.domain.Message;
-import org.springframework.context.annotation.Primary;
+import com.example.domain.Message;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
