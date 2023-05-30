@@ -18,4 +18,9 @@ public class MessagesController {
     public String getMessages() {
         return service.getMessages();
     }
+
+    @GetMapping("/health")
+    private String healthCheck(){
+        return "OK";
+    }
 }

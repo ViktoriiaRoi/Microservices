@@ -29,4 +29,8 @@ public class FacadeController {
         return service.postMessage(text);
     }
 
+    @GetMapping("/health")
+    private String healthCheck(){
+        return "OK";
+    }
 }

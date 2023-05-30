@@ -2,6 +2,8 @@ package com.example.facadeservice.service;
 
 import com.example.domain.Message;
 import com.example.facadeservice.repository.FacadeRepository;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,35 +18,34 @@ public class FacadeServiceImpl implements FacadeService {
 
     private final FacadeRepository repository;
 
-    List<WebClient> loggingClientList = List.of(
-            WebClient.create("http://localhost:8081"),
-            WebClient.create("http://localhost:8082"),
-            WebClient.create("http://localhost:8083")
-    );
+    private final DiscoveryClient discoveryClient;
 
-    List<WebClient> messagesClientList = List.of(
-            WebClient.create("http://localhost:8084"),
-            WebClient.create("http://localhost:8085")
-    );
+    private final String LOGGING_SERVICE = "logging-service";
+    private final String MESSAGES_SERVICE = "messages-service";
 
-    public FacadeServiceImpl(FacadeRepository repository) {
+    public FacadeServiceImpl(FacadeRepository repository, DiscoveryClient discoveryClient) {
         this.repository = repository;
+        this.discoveryClient = discoveryClient;
     }
 
     @Override
     public Mono<String> getMessages() {
-        var loggingClient = getRandomLoggingClient();
-        var messagesClient = getRandomMessagesClient();
+        var loggingService = getRandomService(LOGGING_SERVICE);
+        var messagesService = getRandomService(MESSAGES_SERVICE);
 
-        Mono<String> loggingResponse = getResponse(loggingClient, "/logging-service");
-        Mono<String> messagesResponse = getResponse(messagesClient, "/messages-service");
+        if (loggingService == null) return Mono.just("Logging service is unavailable now");
+        if (messagesService == null) return Mono.just("Messages service is unavailable now");
+
+        Mono<String> loggingResponse = getResponse(loggingService, "/logging-service");
+        Mono<String> messagesResponse = getResponse(messagesService, "/messages-service");
 
         return loggingResponse
                 .zipWith(messagesResponse, (logging, messages) -> String.format("Logging: %s\nMessages: %s", logging, messages))
                 .onErrorReturn("One of services thrown error");
     }
 
-    private Mono<String> getResponse(WebClient client, String uri) {
+    private Mono<String> getResponse(ServiceInstance service, String uri) {
+        WebClient client = WebClient.create(service.getUri().toString());
         return client.get()
                 .uri(uri)
                 .retrieve()
@@ -65,10 +66,11 @@ public class FacadeServiceImpl implements FacadeService {
     }
 
     private Mono<Void> postMessageToLogging(Message message) {
-        var loggingClient = getRandomLoggingClient();
-        System.out.printf("Sent message %s to the logging service %d\n", message.getText(), loggingClient.hashCode());
+        var loggingService = getRandomService(LOGGING_SERVICE);
+        System.out.printf("Sent message %s to the logging service %d\n", message.getText(), loggingService.hashCode());
 
-        return loggingClient.post()
+        WebClient client = WebClient.create(loggingService.getUri().toString());
+        return client.post()
                 .uri("/logging-service")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(message)
@@ -76,11 +78,11 @@ public class FacadeServiceImpl implements FacadeService {
                 .bodyToMono(Void.class);
     }
 
-    private WebClient getRandomLoggingClient() {
-        return loggingClientList.get(random.nextInt(loggingClientList.size()));
-    }
-
-    private WebClient getRandomMessagesClient() {
-        return messagesClientList.get(random.nextInt(messagesClientList.size()));
+    private ServiceInstance getRandomService(String serviceId) {
+        List<ServiceInstance> serviceList = discoveryClient.getInstances(serviceId);
+        if (serviceList != null && serviceList.size() > 0 ) {
+            return serviceList.get(random.nextInt(serviceList.size()));
+        }
+        return null;
     }
 }

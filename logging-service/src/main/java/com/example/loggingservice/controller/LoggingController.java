@@ -29,4 +29,8 @@ public class LoggingController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/health")
+    private String healthCheck(){
+        return "OK";
+    }
 }
